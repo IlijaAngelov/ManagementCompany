@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Import>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ImportShift>
  */
 class ImportFactory extends Factory
 {

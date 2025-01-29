@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\ImportController;
+use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -8,7 +8,8 @@ Route::get('/import', function () {
     return view('import');
 });
 
-Route::post('/import', [ImportController::class, 'importCSV'])->name('import');
+//Route::post('/import', [ShiftController::class, 'importCSV'])->name('import');
+Route::post('/import', [ShiftController::class, 'importShifts'])->name('import');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

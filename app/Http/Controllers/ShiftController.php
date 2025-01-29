@@ -2,14 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Import;
+use App\Jobs\ShiftImportJob;
+use App\Models\ImportShift;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
-class ImportController extends Controller
+class ShiftController extends Controller
 {
+    public function importShifts(Request $request): RedirectResponse
+    {
+        $path = Storage::disk('local')->put('/import/shifts', $request->file('import_csv'));
+        dispatch(new ShiftImportJob($path));
+        return redirect()->route('import')->with('success', 'Importing has been started. It may take a while!');
+
+    }
+
     public function importCSV(Request $request): \Illuminate\Http\RedirectResponse
     {
         $request->validate([
@@ -30,7 +39,7 @@ class ImportController extends Controller
             }
 
             try {
-                $import = new Import();
+                $import = new ImportShift();
                 $import->employee = $data[1];
                 $import->employer = $data[2];
                 $import->hours = $data[3];
@@ -38,7 +47,8 @@ class ImportController extends Controller
                 $import->taxable = $data[5];
                 $import->status = $data[6];
                 $import->shift_type = $data[7];
-                $import->paid_at = empty($data[8]) ? null : Carbon::parse($data[8]);
+                $import->paid_at = empty($data[8]) ? null : (Carbon::hasFormat($data[8], 'Y-m-d') ? Carbon::parse($data[8]) : null);
+//                $import->paid_at = empty($data[8]) ? null : Carbon::parse($data[8]);
                 $import->date = $data[0];
                 $import->save();
             } catch(\Exception $e) {
@@ -47,7 +57,7 @@ class ImportController extends Controller
         }
         fclose($handle);
 
-        return redirect()->route('import')->with('success', 'Import has been finished');
+        return redirect()->route('import')->with('success', 'ImportShift has been finished');
 
     }
 
