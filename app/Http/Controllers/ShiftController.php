@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\ImportCsvAction;
 use App\Jobs\ShiftImportJob;
 use App\Models\ImportShift;
 use Carbon\Carbon;
@@ -11,10 +12,10 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class ShiftController extends Controller
 {
-    public function importShifts(Request $request): RedirectResponse
+
+    public function importShifts(Request $request, ImportCsvAction $importCsvAction): RedirectResponse
     {
-        $path = Storage::disk('local')->put('/import/shifts', $request->file('import_csv'));
-        dispatch(new ShiftImportJob($path));
+        $importCsvAction->handle($request);
         return redirect()->route('import')->with('success', 'Importing has been started. It may take a while!');
 
     }
