@@ -8,7 +8,6 @@ Route::get('/import', function () {
     return view('import');
 });
 
-//Route::post('/import', [ShiftController::class, 'importCSV'])->name('import');
 Route::post('/import', [ShiftController::class, 'importShifts'])->name('import');
 
 Route::get('/dashboard', function () {
