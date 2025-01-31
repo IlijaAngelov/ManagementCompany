@@ -14,11 +14,13 @@ use Spatie\SimpleExcel\SimpleExcelReader;
 
 class ShiftImportJob implements ShouldQueue
 {
-    use Dispatchable, Queueable, InteractsWithQueue, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries = 3;
+
     public int $timeout = 1200;
-    public function __construct(public $path){}
+
+    public function __construct(public $path) {}
 
     public function handle(): void
     {
@@ -27,7 +29,7 @@ class ShiftImportJob implements ShouldQueue
             ->chunk(1000)
             ->each(function ($row) {
                 foreach ($row as $item) {
-                    $import = new ImportShift();
+                    $import = new ImportShift;
                     $import->employee = $item['Employee'];
                     $import->employer = $item['Employer'];
                     $import->hours = $item['Hours'];
@@ -39,7 +41,7 @@ class ShiftImportJob implements ShouldQueue
                     $import->date = $item['Date'];
                     $import->save();
                 }
-        });
+            });
 
         Storage::delete($this->path);
     }

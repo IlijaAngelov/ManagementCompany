@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('status');
             $table->string('shift_type');
 
-            $table->timestamp("paid_at")->nullable();
+            $table->timestamp('paid_at')->nullable();
             $table->date('date')->nullable();
         });
     }

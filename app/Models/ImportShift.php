@@ -25,6 +25,4 @@ class ImportShift extends Model
     ];
 
     public $timestamps = false;
-
-
 }

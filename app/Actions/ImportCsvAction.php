@@ -8,9 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ImportCsvAction
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function handle(Request $request): void
     {

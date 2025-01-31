@@ -9,10 +9,10 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class ShiftController extends Controller
 {
-
     public function importShifts(Request $request, ImportCsvAction $importCsvAction): RedirectResponse
     {
         $importCsvAction->handle($request);
+
         return redirect()->route('import')->with('success', 'Importing has been started. It may take a while!');
 
     }
@@ -21,19 +21,19 @@ class ShiftController extends Controller
     {
         $data = [];
         $header = null;
-        if(($handle = fopen($request->file("import_csv"), "r")) !== false) {
-            while (($row = fgetcsv($handle, 1000, ",")) !== false) {
-                if(!$header){
+        if (($handle = fopen($request->file('import_csv'), 'r')) !== false) {
+            while (($row = fgetcsv($handle, 1000, ',')) !== false) {
+                if (! $header) {
                     $header = $row;
                 } else {
                     $data[] = array_combine($header, $row);
-                    $rows = implode(",", $row);
+                    $rows = implode(',', $row);
                     Storage::append('import.csv', $rows);
                 }
             }
             fclose($handle);
         }
+
         return $data;
     }
-
 }
