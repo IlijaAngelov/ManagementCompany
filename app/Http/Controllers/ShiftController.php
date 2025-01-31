@@ -17,6 +17,10 @@ class ShiftController extends Controller
 
     }
 
+    /**
+     * @param Request $request
+     * @return array<int, array<string, string|null>>
+     */
     public function importToFile(Request $request): array
     {
         $data = [];

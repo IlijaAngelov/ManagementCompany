@@ -20,7 +20,7 @@ class ShiftImportJob implements ShouldQueue
 
     public int $timeout = 1200;
 
-    public function __construct(public $path) {}
+    public function __construct(public bool|string $path) {}
 
     public function handle(): void
     {
