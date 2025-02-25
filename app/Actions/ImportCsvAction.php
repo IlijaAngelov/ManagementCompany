@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions;
 
 use App\Jobs\ShiftImportJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class ImportCsvAction
+final class ImportCsvAction
 {
     public function __construct() {}
 

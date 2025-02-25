@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ShiftController;
 use Illuminate\Support\Facades\Route;
