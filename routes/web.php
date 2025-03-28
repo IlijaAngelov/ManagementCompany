@@ -10,9 +10,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/import', function () {
-    return view('import');
-});
+// Route::get('/import', function () {
+//     return view('import');
+// });
 
 Route::post('/import', [ShiftController::class, 'importShifts'])->name('import');
+
+
+Route::get('/{any}', function () {
+    return view('app');
+})->where('any', '.*');
 

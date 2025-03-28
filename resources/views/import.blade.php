@@ -1,4 +1,19 @@
-<h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laravel + React11</title>
+    @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+</head>
+<body>
+<!-- <nav id="navigation"></nav> -->
+<!-- {{--    <div id="app"></div>--}} -->
+</body>
+</html>
+
+
+<!-- <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
     {{ __('Import') }}
 </h2>
 <div class="container mt-4">
@@ -21,4 +36,4 @@
             <button type="submit" class="btn btn-success">Import CSV</button>
         </form>
     </div>
-</div>
+</div> -->
