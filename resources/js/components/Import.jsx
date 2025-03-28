@@ -14,19 +14,24 @@ export function Import() {
                 method: 'POST',
                 body: formData,
                 headers: {
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 }
             });
             
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const data = await response.json();
-            setMessage(data.success);
+            setMessage(data.message || 'File uploaded successfully');
         } catch (error) {
-            setMessage('Error uploading file');
+            console.error('Upload error:', error);
+            setMessage('Error uploading file: ' + error.message);
         }
     };
 
     return (
-        // <div>ugh</div>
         <div className="container mt-4">
             {message && (
                 <div className="alert alert-success">

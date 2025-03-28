@@ -8,15 +8,23 @@ use App\Actions\ImportCsvAction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 final class ShiftController extends Controller
 {
-    public function importShifts(Request $request, ImportCsvAction $importCsvAction): RedirectResponse
+    public function importShifts(Request $request, ImportCsvAction $importCsvAction): JsonResponse
     {
-        $importCsvAction->handle($request);
+        try {
+            $importCsvAction->handle($request);
 
-        return redirect()->route('import')->with('success', 'Importing has been started. It may take a while!');
-
+            return response()->json([
+                'message' => 'Importing has started. It may take a while'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 422);
+        }
     }
 
     /**

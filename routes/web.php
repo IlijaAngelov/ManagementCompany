@@ -14,7 +14,7 @@ Route::get('/', function () {
 //     return view('import');
 // });
 
-Route::post('/import', [ShiftController::class, 'importShifts'])->name('import');
+Route::post('/api/import', [ShiftController::class, 'importShifts'])->name('import');
 
 
 Route::get('/{any}', function () {
