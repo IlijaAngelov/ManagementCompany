@@ -11,6 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Concurrency;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use PDOStatement;
@@ -30,47 +31,58 @@ final class ShiftImportJob implements ShouldQueue
 
     public function handle(): void
     {
+        $now = now()->format('Y-m-d H:i:s');
+        $numberOfProcesses = 10;
+        $filePath = Storage::disk('local')->path($this->path);
         Log::info("Started");
-        $chunkSize = 500;
-        $chunks = [];
-        $handle = fopen(Storage::disk('local')->path($this->path), 'r');
-        fgetcsv($handle);
+        $tasks = [];
+        for ($i = 0; $i < $numberOfProcesses; $i++) {
+            $tasks[] = function () use ($filePath, $i, $numberOfProcesses, $now) {
+                DB::reconnect();
 
-        try {
-            $pdo = DB::connection()->getPdo();
-            $stmt = $this->prepareChunkedStatement($chunkSize);
+                $handle = fopen($filePath, 'r');
+                fgets($handle); // Skip header
+                $currentLine = 0;
+                $customers = [];
 
-            while (($line = fgetcsv($handle)) !== false) {
-                $chunks = array_merge($chunks, [
-                    $line[1], $line[2], $line[3], $line[4], $line[5], $line[6], $line[7],
-                    $line[8] ? \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $line[8])->format('Y-m-d H:i:s') : null,
-                    $line[0],
-                ]);
+                while (($line = fgets($handle)) !== false) {
+                    // Each process takes every Nth line
+                    if ($currentLine++ % $numberOfProcesses !== $i) {
+                        continue;
+                    }
 
-                if (count($chunks) === $chunkSize * 9) {
-                    $stmt->execute($chunks);
-                    $chunks = [];
+                    $row = str_getcsv($line);
+                    $customers[] = [
+                        'employee' => $row[1],
+                        'employer' => $row[2],
+                        'hours' => $row[3],
+                        'rate_per_hour' => $row[4],
+                        'taxable' => $row[5],
+                        'status' => $row[6],
+                        'shift_type' => $row[7],
+                        'paid_at' => $now,
+                        'date' => $row[0],
+                    ];
+
+                    if (count($customers) === 1000) {
+                        DB::table('imports')->insert($customers);
+                        $customers = [];
+                    }
                 }
-            }
 
-            if (!empty($chunks)) {
-                $remainingRows = count($chunks) / 9;
-                $stmt = $this->prepareChunkedStatement($remainingRows);
-                $stmt->execute($chunks);
-            }
-        } finally {
-            fclose($handle);
+                if (!empty($customers)) {
+                    DB::table('imports')->insert($customers);
+                }
+
+                fclose($handle);
+
+                return true;
+            };
         }
 
-        Log::info("Ended");
+        Concurrency::run($tasks);
+        Log::info("Finished");
 
     }
 
-    private function prepareChunkedStatement($chunkSize): PDOStatement
-    {
-        $rowPlaceholders = '(?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        $placeholders = implode(',', array_fill(0, $chunkSize, $rowPlaceholders));
-
-        return DB::connection()->getPdo()->prepare("INSERT INTO imports (employee, employer, hours, rate_per_hour, taxable, status, shift_type, paid_at, date) VALUES {$placeholders}");
-    }
 }
