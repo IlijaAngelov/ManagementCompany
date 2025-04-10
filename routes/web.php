@@ -19,5 +19,3 @@ Route::get('/{any}', function () {
     return view('app');
 })->where('any', '.*');
 
-// to-do
-// recheck the NavBar and App.jsx
